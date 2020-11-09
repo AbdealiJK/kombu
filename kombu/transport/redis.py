@@ -498,6 +498,7 @@ class Channel(virtual.Channel):
     )
 
     connection_class = redis.Connection if redis else None
+    connection_class_ssl = redis.SSLConnection if redis else None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -928,7 +929,7 @@ class Channel(virtual.Channel):
             # 'ssl_cert_reqs', 'ssl_ca_certs', 'ssl_certfile', 'ssl_keyfile'
             try:
                 connparams.update(conninfo.ssl)
-                connparams['connection_class'] = redis.SSLConnection
+                connparams['connection_class'] = self.connection_class_ssl
             except TypeError:
                 pass
         host = connparams['host']
@@ -1114,6 +1115,7 @@ class SentinelChannel(Channel):
         'sentinel_kwargs')
 
     connection_class = sentinel.SentinelManagedConnection if sentinel else None
+    connection_class_ssl = sentinel.SentinelManagedSSLConnection if sentinel else None
 
     def _sentinel_managed_pool(self, asynchronous=False):
         connparams = self._connparams(asynchronous)
